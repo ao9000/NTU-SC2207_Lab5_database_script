@@ -1,0 +1,144 @@
+CREATE TABLE employees(
+	EID varchar(5),  
+	Name varchar(50),
+	salary int, 
+	Primary Key(EID),
+);
+
+CREATE TABLE customers(
+	CID varchar(5), 
+	Name varchar(50),
+	PRIMARY KEY(CID)
+);
+
+CREATE TABLE bookstore(
+	BID varchar(5)
+	PRIMARY KEY (BID)
+);
+
+CREATE TABLE publication(
+ 	PubID varchar(5), 
+	publisher varchar(40),
+ 	year int, 
+	PRIMARY KEY(PubID)
+);
+
+CREATE TABLE magazines(
+	PubID varchar(5),
+	issue varchar(20),
+	title varchar(50),
+	FOREIGN KEY (PubID) REFERENCES publication(PubID),
+);
+
+CREATE TABLE books(
+	PubID varchar(5),
+	title varchar(50),
+	FOREIGN KEY (PubID) REFERENCES publication(PubID),
+);
+
+CREATE TABLE orders
+(
+ 	OrderID varchar(5) NOT NULL,
+	date_time datetime NOT NULL,
+	shipping_address varchar(20) NOT NULL,
+    CID varchar(5) NOT NULL,
+ 	PRIMARY KEY(OrderID),
+ 	FOREIGN KEY (CID) REFERENCES customers(CID),
+);
+
+CREATE TABLE complaints(
+    	complaintID varchar(5) NOT NULL,
+ 	EID varchar(5) NOT NULL,
+ 	CID varchar(5) NOT NULL,
+ 	filed_date_time datetime NOT NULL,
+ 	Text varchar(100) NOT NULL,
+ 	handled_date_time datetime NOT NULL,
+ 	PRIMARY KEY(complaintID),
+	FOREIGN KEY (EID) REFERENCES employees(EID),
+	FOREIGN KEY (CID) REFERENCES customers(CID),
+);
+
+CREATE TABLE complaints_on_bookstore(
+	complaintID varchar(5),
+	BID varchar(5),
+	PRIMARY KEY (complaintID, BID),
+	FOREIGN KEY (complaintID) REFERENCES complaints(complaintID),
+	FOREIGN KEY (BID) REFERENCES bookstore(BID),
+);
+
+CREATE TABLE complaints_on_orders(
+	complaintID varchar(5),
+	OID varchar(5),
+	PRIMARY KEY (complaintID, OID),
+	FOREIGN KEY (complaintID) REFERENCES complaints(complaintID),
+	FOREIGN KEY (OID) REFERENCES orders(orderID),
+);
+
+CREATE TABLE complaint_status(
+	date date,	
+	complaintID varchar(5),
+	state varchar(15),
+	PRIMARY KEY (date, complaintID),
+	FOREIGN KEY (complaintID) REFERENCES complaints(complaintID),
+);
+
+CREATE TABLE stocks_in_bookstore(
+	stockID varchar(5) NOT NULL,	
+	BID varchar(5) NOT NULL,
+	PubID varchar(5) NOT NULL,
+	stock_qty int NOT NULL,
+	stock_price DECIMAL(5,2) NOT NULL,
+	PRIMARY KEY (stockID),
+	FOREIGN KEY (BID) REFERENCES bookstore(BID),
+	FOREIGN KEY (PubID) REFERENCES publication(PubID),
+);
+
+CREATE TABLE price_history(
+	stockID varchar(5) NOT NULL,	
+	BID varchar(5) NOT NULL,
+	PubID varchar(5) NOT NULL,
+	start_date date NOT NULL,
+	end_date date,
+	price DECIMAL(5,2) NOT NULL,
+	PRIMARY KEY (BID,stockID,PubID,start_date,end_date,price),
+	FOREIGN KEY (stockID) REFERENCES stocks_in_bookstore(stockID),
+	FOREIGN KEY (BID) REFERENCES bookstore(BID),
+	FOREIGN KEY (PubID) REFERENCES publication(PubID),	
+);
+
+CREATE TABLE items_in_orders(
+	itemID varchar(5),
+	BID varchar(5),
+	stockID varchar(5),
+	PubID varchar(5),
+	OID varchar(5),
+	item_price decimal(5,2),
+	item_qty int,
+	Delivery_date date,
+	Comment varchar(100),
+	Rating int,
+	Date_time datetime,
+	CID varchar(5),
+	PRIMARY KEY (itemID),
+	FOREIGN KEY (CID) REFERENCES customers(CID),
+	FOREIGN KEY (BID) REFERENCES bookstore(BID),
+	FOREIGN KEY (stockID) REFERENCES stocks_in_bookstore(stockID),
+	FOREIGN KEY (PubID) REFERENCES publication(PubID),
+	FOREIGN KEY (OID) REFERENCES orders(orderID),
+);
+
+CREATE TABLE items_order_status (
+	date date,
+	itemID varchar(5),
+	stockID varchar(5),
+	BID varchar(5),
+	PubID varchar(5),
+	state varchar(15),
+	PRIMARY KEY (date,itemID,stockID,BID,PubID),
+	FOREIGN KEY (itemID) REFERENCES items_in_orders(itemID),
+	FOREIGN KEY (stockID) REFERENCES stocks_in_bookstore(stockID),
+	FOREIGN KEY (BID) REFERENCES bookstore(BID),
+	FOREIGN KEY (PubID) REFERENCES publication(PubID),	
+);
+
+

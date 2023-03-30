@@ -1,0 +1,5 @@
+﻿Date,ItemID,bID,StockID,PubID,State
+1/3/2023,1,101,1,1,Shipped
+2/3/2023,2,102,2,2,Delivered
+3/3/2023,3,101,3,1,In transit
+4/3/2023,4,103,4,3,Processing
